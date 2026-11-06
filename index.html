@@ -104,6 +104,7 @@
   // 카카오톡으로 보내기: Kakao Developers의 JavaScript 키를 넣으면 버튼이 나타남
   // (앱 설정 > 플랫폼 > Web 에 배포 도메인 등록 필요)
   const KAKAO_JS_KEY = "95b285968b85ed9548a9e981b0381156";
+  const KAKAO_TEMPLATE_ID = 138682; // 메시지 템플릿 빌더의 템플릿 ID (0이면 기본 카드 사용)
   if (KAKAO_JS_KEY) {
     const s = document.createElement("script");
     s.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
@@ -120,6 +121,14 @@
     const base = url.replace(/index\.html$/, "");
     track("send", { ch: "kakao", edited: edited() });
     try {
+      // 메시지 템플릿 빌더의 템플릿(버튼 없음)이 있으면 그걸로 보냄. 인자: ${text}, ${img}
+      if (KAKAO_TEMPLATE_ID) {
+        Kakao.Share.sendCustom({
+          templateId: KAKAO_TEMPLATE_ID,
+          templateArgs: { text, img: `${base}card${idx + 1}.png` }
+        });
+        return;
+      }
       // 피드 템플릿: 카드 이미지(card1~3.png) + 문구. 이미지는 make_cards.py 로 생성
       Kakao.Share.sendDefault({
         objectType: "feed",
