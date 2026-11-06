@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>가족에게 마음 전하기</title>
+<style>
+  :root{--bg:#fff7f2;--card:#fff;--ink:#2b2320;--sub:#8a7a73;--accent:#ff6b4a;--kakao:#fee500;--line:#f0e2da}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  .wrap{max-width:480px;margin:0 auto;padding:28px 18px 40px}
+  h1{font-size:24px;margin:0 0 6px;text-align:center}
+  .lead{color:var(--sub);text-align:center;margin:0 0 22px;font-size:15px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tab{flex:1;padding:10px 0;border:1px solid var(--line);background:var(--card);border-radius:999px;font-size:14px;color:var(--sub);cursor:pointer}
+  .tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+  .card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 4px 18px rgba(80,40,20,.08)}
+  textarea{width:100%;min-height:150px;border:0;resize:vertical;font-size:17px;line-height:1.6;color:var(--ink);font-family:inherit;outline:none;background:transparent}
+  .hint{font-size:12px;color:var(--sub);margin-top:6px;text-align:right}
+  .btns{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+  button.act{width:100%;padding:16px;border:0;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer}
+  .sms{background:var(--accent);color:#fff}
+  .kakao{background:var(--kakao);color:#3a1d1d}
+  .share{background:#fff;color:var(--ink);border:1px solid var(--line)!important}
+  .copy{background:#fff;color:var(--ink);border:1px solid var(--line)!important}
+  .contact{background:#fff;color:var(--accent);border:1px solid var(--accent)!important}
+  .picked{font-size:14px;color:var(--sub);text-align:center;min-height:20px;margin-top:4px}
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#2b2320;color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💌 가족에게 마음 전하기</h1>
+  <p class="lead">문구를 고르고, 원하면 고친 다음 보내보세요</p>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="card">
+    <textarea id="msg"></textarea>
+    <div class="hint">✏️ 호칭이나 내용을 자유롭게 바꿔도 돼요</div>
+  </div>
+
+  <div class="btns">
+    <button class="act contact" id="pickBtn" hidden>📇 연락처에서 받는 사람 선택</button>
+    <div class="picked" id="picked"></div>
+    <button class="act sms" id="smsBtn">💬 문자로 보내기</button>
+    <button class="act kakao" id="kakaoBtn" hidden>💛 카카오톡으로 보내기</button>
+    <button class="act share" id="shareBtn">📤 다른 앱으로 공유하기</button>
+    <button class="act copy" id="copyBtn">📋 문구 복사하기</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ▼ 문구는 여기만 고치면 됩니다
+  const MESSAGES = [
+    { label: "고마워요", text: "엄마, 아빠\n항상 곁에서 응원해줘서 정말 고마워요.\n말로 잘 못했지만 늘 감사하고 있어요. 사랑해요 ❤️" },
+    { label: "보고싶어요", text: "요즘 바빠서 연락 자주 못 했네요.\n문득 생각나서 연락해요. 보고 싶어요!\n이번 주말에 밥 같이 먹어요 😊" },
+    { label: "사랑해요", text: "우리 가족이라서 참 다행이에요.\n건강 잘 챙기고, 오늘도 좋은 하루 보내요.\n사랑해요 💕" }
+  ];
+
+  const $ = id => document.getElementById(id);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let phone = "";
+
+  // QR 주소 끝에 ?m=1, ?m=2, ?m=3 을 붙이면 해당 문구로 시작
+  let idx = Math.min(Math.max(parseInt(new URLSearchParams(location.search).get("m") || "1", 10) - 1, 0), MESSAGES.length - 1);
+  if (isNaN(idx)) idx = 0;
+
+  // ▼ 집계: Apps Script 웹앱 주소(…/exec)를 넣으면 구글 시트에 기록됨. 문구 내용은 보내지 않음
+  const LOG_URL = "";
+  const qrM = new URLSearchParams(location.search).get("m") || "";
+  function track(event, extra){
+    if (!LOG_URL) return;
+    const p = new URLSearchParams({ event, m: String(idx + 1), qr: qrM, ...extra });
+    try { navigator.sendBeacon(LOG_URL, p) || fetch(LOG_URL, { method:"POST", body:p, mode:"no-cors", keepalive:true }); } catch(e) {}
+  }
+  const edited = () => $("msg").value !== MESSAGES[idx].text ? "Y" : "N";
+  track("visit");
+
+  function render(){
+    $("tabs").innerHTML = "";
+    MESSAGES.forEach((m, i) => {
+      const b = document.createElement("button");
+      b.className = "tab" + (i === idx ? " on" : "");
+      b.textContent = m.label;
+      b.onclick = () => { if (i !== idx) { idx = i; render(); track("tab"); } };
+      $("tabs").appendChild(b);
+    });
+    $("msg").value = MESSAGES[idx].text;
+  }
+  render();
+
+  function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),1800); }
+
+  // 문자 보내기: 받는 사람이 비어 있으면 문자 앱에서 연락처를 고르면 됨
+  $("smsBtn").onclick = () => {
+    const body = encodeURIComponent($("msg").value);
+    const num = phone.replace(/[^0-9+]/g, "");
+    track("send", { ch: "sms", edited: edited() });
+    location.href = isIOS ? `sms:${num}&body=${body}` : `sms:${num}?body=${body}`;
+  };
+
+  // 카카오톡으로 보내기: Kakao Developers의 JavaScript 키를 넣으면 버튼이 나타남
+  // (앱 설정 > 플랫폼 > Web 에 배포 도메인 등록 필요)
+  const KAKAO_JS_KEY = "";
+  if (KAKAO_JS_KEY) {
+    const s = document.createElement("script");
+    s.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
+    s.crossOrigin = "anonymous";
+    s.onload = () => {
+      if (!Kakao.isInitialized()) Kakao.init(KAKAO_JS_KEY);
+      $("kakaoBtn").hidden = false;
+    };
+    document.head.appendChild(s);
+  }
+  $("kakaoBtn").onclick = () => {
+    let text = $("msg").value;
+    if (text.length > 200) text = text.slice(0, 199) + "…"; // 텍스트 템플릿 최대 200자
+    const url = location.origin + location.pathname;
+    track("send", { ch: "kakao", edited: edited() });
+    try {
+      Kakao.Share.sendDefault({
+        objectType: "text",
+        text,
+        link: { mobileWebUrl: url, webUrl: url },
+        buttonTitle: "나도 마음 전하기"
+      });
+    } catch(e) { toast("카카오톡을 열 수 없어요. 공유하기를 이용해 주세요"); }
+  };
+
+  // 공유하기: 폰 공유창 → 원하는 앱 선택
+  $("shareBtn").onclick = async () => {
+    const text = $("msg").value;
+    track("send", { ch: "share", edited: edited() });
+    if (navigator.share) {
+      try { await navigator.share({ text }); } catch(e) {}
+    } else {
+      await copy(text); toast("복사됐어요! 카카오톡에 붙여넣어 주세요");
+    }
+  };
+
+  async function copy(text){
+    try { await navigator.clipboard.writeText(text); }
+    catch(e){ const t=document.createElement("textarea"); t.value=text; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+  }
+  $("copyBtn").onclick = async () => { track("send", { ch: "copy", edited: edited() }); await copy($("msg").value); toast("문구가 복사됐어요"); };
+
+  // 연락처 선택: 지원되는 브라우저(안드로이드 크롬)에서만 버튼 표시
+  if ("contacts" in navigator && "ContactsManager" in window) {
+    $("pickBtn").hidden = false;
+    $("pickBtn").onclick = async () => {
+      try {
+        const [c] = await navigator.contacts.select(["name","tel"], { multiple:false });
+        if (c && c.tel && c.tel[0]) {
+          phone = c.tel[0];
+          $("picked").textContent = `받는 사람: ${(c.name && c.name[0]) || ""} ${phone}`;
+        }
+      } catch(e) {}
+    };
+  }
+</script>
+</body>
+</html>
