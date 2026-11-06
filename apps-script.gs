@@ -14,7 +14,9 @@ const HEADERS = ["시간", "이벤트", "문구", "QR", "채널", "수정여부"
 
 function doPost(e) {
   const p = (e && e.parameter) || {};
-  const sheet = SpreadsheetApp.getActive().getSheetByName("log");
+  const ss = SpreadsheetApp.getActive();
+  let sheet = ss.getSheetByName("log");
+  if (!sheet) { sheet = ss.insertSheet("log"); sheet.appendRow(HEADERS); sheet.setFrozenRows(1); }
   sheet.appendRow([
     new Date(),
     String(p.event || "").slice(0, 20),
