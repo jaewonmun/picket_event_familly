@@ -3,7 +3,7 @@ import sys, qrcode
 from qrcode.constants import ERROR_CORRECT_M
 
 base = sys.argv[1].rstrip("/") + "/"
-for m in (1, 2, 3):
+for m in range(1, 6):
     url = f"{base}?m={m}"
     qr = qrcode.QRCode(error_correction=ERROR_CORRECT_M, box_size=40, border=4)
     qr.add_data(url)

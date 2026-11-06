@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>가족에게 마음 전하기</title>
+<title>온기배달 - 올해가 가기 전에 한마디</title>
 <style>
   :root{--bg:#fff7f2;--card:#fff;--ink:#2b2320;--sub:#8a7a73;--accent:#ff6b4a;--kakao:#fee500;--line:#f0e2da}
   *{box-sizing:border-box}
@@ -11,8 +11,8 @@
   .wrap{max-width:480px;margin:0 auto;padding:28px 18px 40px}
   h1{font-size:24px;margin:0 0 6px;text-align:center}
   .lead{color:var(--sub);text-align:center;margin:0 0 22px;font-size:15px}
-  .tabs{display:flex;gap:8px;margin-bottom:12px}
-  .tab{flex:1;padding:10px 0;border:1px solid var(--line);background:var(--card);border-radius:999px;font-size:14px;color:var(--sub);cursor:pointer}
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tab{flex:1;min-width:0;padding:10px 0;white-space:nowrap;letter-spacing:-.3px;border:1px solid var(--line);background:var(--card);border-radius:999px;font-size:13px;color:var(--sub);cursor:pointer}
   .tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
   .card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 4px 18px rgba(80,40,20,.08)}
   textarea{width:100%;min-height:150px;border:0;resize:vertical;font-size:17px;line-height:1.6;color:var(--ink);font-family:inherit;outline:none;background:transparent}
@@ -31,8 +31,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>💌 가족에게 마음 전하기</h1>
-  <p class="lead">문구를 고르고, 원하면 고친 다음 보내보세요</p>
+  <h1>💌 온기배달</h1>
+  <p class="lead"><b>올해가 가기 전에 한마디</b><br>가족에게 전할 문구를 고르고, 원하면 고친 다음 보내보세요</p>
 
   <div class="tabs" id="tabs"></div>
   <div class="card">
@@ -54,9 +54,11 @@
 <script>
   // ▼ 문구는 여기만 고치면 됩니다
   const MESSAGES = [
-    { label: "고마워요", text: "엄마, 아빠\n항상 곁에서 응원해줘서 정말 고마워요.\n말로 잘 못했지만 늘 감사하고 있어요. 사랑해요 ❤️" },
-    { label: "보고싶어요", text: "요즘 바빠서 연락 자주 못 했네요.\n문득 생각나서 연락해요. 보고 싶어요!\n이번 주말에 밥 같이 먹어요 😊" },
-    { label: "사랑해요", text: "우리 가족이라서 참 다행이에요.\n건강 잘 챙기고, 오늘도 좋은 하루 보내요.\n사랑해요 💕" }
+    { label: "고마워요", text: "올해도 곁에 있어줘서 고마워요.\n말로 잘 못 했지만 늘 감사하고 있어요.\n올해가 가기 전에 꼭 전하고 싶었어요 ❤️" },
+    { label: "미안해요", text: "바쁘다는 핑계로 연락이 뜸했죠.\n서운하게 한 일이 있었다면 미안해요.\n앞으로 더 자주 마음 표현할게요." },
+    { label: "사랑해요", text: "우리 가족이라서 참 다행이에요.\n늘 말하지 못했지만 정말 사랑해요 💕\n남은 올해도 따뜻하게 보내요." },
+    { label: "응원해요", text: "올 한 해 정말 수고 많았어요.\n힘들 때도 늘 내가 응원하고 있어요!\n내년에도 지금처럼 함께해요 👏" },
+    { label: "약속해요", text: "올해가 가기 전에 약속할게요.\n다음 주 수요일 저녁엔 같이 밥 먹어요.\n앞으로 더 자주 함께할게요 🤝" }
   ];
 
   const $ = id => document.getElementById(id);

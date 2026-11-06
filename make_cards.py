@@ -1,5 +1,5 @@
 # 카톡 공유용 카드 이미지 생성: python make_cards.py
-# 문구 탭 이름이 바뀌면 CARDS 의 title 만 고치고 다시 실행 → card1~3.png
+# 문구 탭 이름이 바뀌면 CARDS 의 title 만 고치고 다시 실행 → card1~5.png
 import math, random
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -8,9 +8,11 @@ FONT_B = "C:/Windows/Fonts/malgunbd.ttf"
 FONT_R = "C:/Windows/Fonts/malgun.ttf"
 
 CARDS = [
-    {"title": "고마워요",   "top": (255, 214, 190), "bottom": (255, 160, 130), "heart": (255, 92, 70),  "ink": (90, 30, 20)},
-    {"title": "보고싶어요", "top": (214, 228, 255), "bottom": (196, 178, 255), "heart": (120, 96, 235), "ink": (40, 30, 90)},
-    {"title": "사랑해요",   "top": (255, 222, 236), "bottom": (255, 150, 190), "heart": (240, 60, 120), "ink": (90, 20, 50)},
+    {"title": "고마워요", "top": (255, 214, 190), "bottom": (255, 160, 130), "heart": (255, 92, 70),  "ink": (90, 30, 20)},
+    {"title": "미안해요", "top": (208, 240, 236), "bottom": (130, 205, 200), "heart": (30, 150, 145), "ink": (15, 60, 60)},
+    {"title": "사랑해요", "top": (255, 222, 236), "bottom": (255, 150, 190), "heart": (240, 60, 120), "ink": (90, 20, 50)},
+    {"title": "응원해요", "top": (255, 242, 196), "bottom": (255, 205, 110), "heart": (245, 140, 20), "ink": (95, 55, 10)},
+    {"title": "약속해요", "top": (214, 228, 255), "bottom": (196, 178, 255), "heart": (120, 96, 235), "ink": (40, 30, 90)},
 ]
 SUB = "가족에게 마음이 도착했어요"
 
