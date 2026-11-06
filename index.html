@@ -68,7 +68,7 @@
   if (isNaN(idx)) idx = 0;
 
   // ▼ 집계: Apps Script 웹앱 주소(…/exec)를 넣으면 구글 시트에 기록됨. 문구 내용은 보내지 않음
-  const LOG_URL = "";
+  const LOG_URL = "https://script.google.com/macros/s/AKfycbxuQqyaAaLeGyLO9gRs5BHuvDvf0d3lz-0nA2kTPN0_E6JdUnNGv5Cu-CnZ3Tu86Z2p/exec";
   const qrM = new URLSearchParams(location.search).get("m") || "";
   function track(event, extra){
     if (!LOG_URL) return;
