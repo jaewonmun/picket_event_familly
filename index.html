@@ -115,16 +115,23 @@
     document.head.appendChild(s);
   }
   $("kakaoBtn").onclick = () => {
-    let text = $("msg").value;
-    if (text.length > 200) text = text.slice(0, 199) + "…"; // 텍스트 템플릿 최대 200자
+    const text = $("msg").value.trim();
     const url = location.origin + location.pathname;
+    const base = url.replace(/index\.html$/, "");
     track("send", { ch: "kakao", edited: edited() });
     try {
+      // 피드 템플릿: 카드 이미지(card1~3.png) + 문구. 이미지는 make_cards.py 로 생성
       Kakao.Share.sendDefault({
-        objectType: "text",
-        text,
-        link: { mobileWebUrl: url, webUrl: url },
-        buttonTitle: "나도 마음 전하기"
+        objectType: "feed",
+        content: {
+          title: text,
+          description: "",
+          imageUrl: `${base}card${idx + 1}.png`,
+          imageWidth: 800,
+          imageHeight: 400,
+          link: { mobileWebUrl: url, webUrl: url }
+        },
+        buttons: [{ title: "나도 마음 전하기", link: { mobileWebUrl: url, webUrl: url } }]
       });
     } catch(e) { toast("카카오톡을 열 수 없어요. 공유하기를 이용해 주세요"); }
   };
